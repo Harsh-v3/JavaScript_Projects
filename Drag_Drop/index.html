@@ -14,15 +14,15 @@
     <div class="drag-container">
       <ul class="drag-list">
         <!-- In Progress Column -->
-        <li class="drag-column backlog-column">
+        <li class="drag-column progress-column">
           <span class="list-heading">
-            <h1>Backlog</h1>
+            <h1>In Progress</h1>
           </span>
           <!-- In Progress Content -->
-          <div id="backlog-content" class="custom-scroll">
+          <div id="progress-content" class="custom-scroll">
             <ul
               class="drag-item-list"
-              id="backlog-list"
+              id="progress-list"
               ondrop="drop(event)"
               ondragover="allowDrop(event)"
               ondragenter="dragEnter(0)"
@@ -43,15 +43,15 @@
           </div>
         </li>
         <!-- Complete Column -->
-        <li class="drag-column progress-column">
+        <li class="drag-column completed-column">
           <span class="list-heading">
-            <h1>In Progress</h1>
+            <h1>Completed</h1>
           </span>
           <!-- Complete Content -->
-          <div id="progress-content" class="custom-scroll">
+          <div id="completed-content" class="custom-scroll">
             <ul
               class="drag-item-list"
-              id="progress-list"
+              id="completed-list"
               ondrop="drop(event)"
               ondragover="allowDrop(event)"
               ondragenter="dragEnter(1)"
