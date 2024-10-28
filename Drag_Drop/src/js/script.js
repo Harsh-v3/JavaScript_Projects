@@ -11,28 +11,18 @@ const itemLists = document.querySelectorAll(".drag-item-list");
 const inProgressList = document.getElementById("progress-list");
 const completedList = document.getElementById("completed-list");
 
-// Items :
+// variables :
 let updatedOnLoad = false;
+
+// Drag Functionality variables :
+let dragging = false;
 let currConatiner;
 let draggedItem;
-
-// Console :
-// console.log(
-//   addBtns,
-//   saveItemBtns,
-//   addItemContainers,
-//   addItems,
-//   itemLists,
-//   inProgressList,
-//   completedList
-// );
 
 // Initializing Arrays :
 let inProgressListArray = [];
 let completedListArray = [];
 let listArrays = [];
-
-// Drag Functionality :
 
 // Get Arrays from localStorage if avalable, set default values if not :
 function getSavedItems() {
@@ -51,18 +41,21 @@ function getSavedItems() {
 
 // Set localStorage Arrays :
 function updateSavedItems() {
-  const listArrays = [inProgressListArray, completedListArray];
+  listArrays = [inProgressListArray, completedListArray];
   const listNames = [
     "inProgressListArrayInLocalStorage",
     "completeListArrayInLocalStorage",
   ];
   listNames.forEach((el, i) => {
-    console.log(el);
     localStorage.setItem(el, JSON.stringify(listArrays[i]));
   });
 }
 
-// updateSavedItems();
+// Filter Arrays to remove empty items :
+function filterArray(array) {
+  const filteredArray = array.filter((item) => item !== null);
+  return filteredArray;
+}
 
 // Create DOM Elements for each list items
 function createItemEl(
@@ -71,14 +64,11 @@ function createItemEl(
   itemsContent,
   itemsIndex
 ) {
-  // List Item :
-  const itemEl = document.createElement("li");
-  itemEl.classList.add("drag-item");
-  itemEl.textContent = itemsContent;
-  itemEl.setAttribute("ondragstart", "drag(event)");
-  itemEl.draggable = true;
-  // Append :
-  itemsContainer.appendChild(itemEl);
+  const html = `
+  <li class="drag-item" ondragstart="drag(event)" draggable="true" contenteditable="true" id="${itemsIndex}" onfocusout="updateItem(${itemsIndex},${itemsContainerIndex})">${itemsContent}</li>
+  `;
+  // Append / insert :
+  itemsContainer.insertAdjacentHTML("beforeend", html);
 }
 
 // Update Items in DOM - Reset HTML , Filter Array , Update local Storage
@@ -87,24 +77,80 @@ function updateUI() {
   if (!updatedOnLoad) {
     getSavedItems();
   }
-  // Progress Column :
-  inProgressList.textContent = "";
-  inProgressListArray.forEach((el, i) => {
-    createItemEl(inProgressList, 0, el, i);
+
+  const lists = [
+    [inProgressList, inProgressListArray],
+    [completedList, completedListArray],
+  ];
+  lists.forEach((mainEl, index) => {
+    mainEl[0].textContent = "";
+    mainEl[1].forEach((el, i) => {
+      createItemEl(mainEl[0], index, el, i);
+    });
+    mainEl[1] = filterArray(mainEl[1]);
   });
-  // Complete Column :
-  completedList.textContent = "";
-  completedListArray.forEach((el, i) => {
-    createItemEl(completedList, 1, el, i);
-  });
+
+  // Run getSavedItems() only once , Update Local Storage
+  updatedOnLoad = true;
+  updateSavedItems();
 }
 
-updateUI();
+// Add to ItemsContainer , Reset Textbox :
+function addToContainer(itemsContainerIndex) {
+  if (!addItems[itemsContainerIndex].textContent) return;
+  const newItemContent = addItems[itemsContainerIndex].textContent;
+  const selectedArray = listArrays[itemsContainerIndex];
+  selectedArray.push(newItemContent);
+  addItems[itemsContainerIndex].textContent = "";
+  updateUI();
+}
+
+// Allow arrays to reflect drag and drop :
+function rebuildArrays() {
+  inProgressListArray = Array.from(inProgressList.children).map(
+    (item) => item.textContent
+  );
+  completedListArray = Array.from(completedList.children).map(
+    (item) => item.textContent
+  );
+  updateUI();
+}
+
+// Onclick Functions :
+
+// Update Item -  update Array Value :
+function updateItem(id, itemsContainerIndex) {
+  const selectedArray = listArrays[itemsContainerIndex];
+  const selectedItemEl = itemLists[itemsContainerIndex].children;
+  if (!dragging) {
+    if (!selectedItemEl[id].textContent) {
+      delete selectedArray[id];
+    } else {
+      selectedArray[id] = selectedItemEl[id].textContent;
+    }
+    updateUI();
+  }
+}
+
+// Show Add Item Input Box :
+function showInputBox(itemsContainerIndex) {
+  addBtns[itemsContainerIndex].style.visibility = "hidden";
+  saveItemBtns[itemsContainerIndex].style.display = "flex";
+  addItemContainers[itemsContainerIndex].style.display = "flex";
+}
+
+// Hide Item Input Box :
+function hideInputBox(itemsContainerIndex) {
+  addBtns[itemsContainerIndex].style.visibility = "visible";
+  saveItemBtns[itemsContainerIndex].style.display = "none";
+  addItemContainers[itemsContainerIndex].style.display = "none";
+  addToContainer(itemsContainerIndex);
+}
 
 // When Item Starts Dragging :
 function drag(e) {
   draggedItem = e.target;
-  console.log("dragged Item : ", draggedItem);
+  dragging = true;
 }
 
 // Items Container allows Items to Drop :
@@ -128,4 +174,9 @@ function drop(e) {
   // Add Items to Container :
   const parentEl = itemLists[currConatiner];
   parentEl.appendChild(draggedItem);
+  // Dragging Complete :
+  dragging = false;
+  rebuildArrays();
 }
+
+updateUI();
