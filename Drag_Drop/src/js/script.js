@@ -14,6 +14,25 @@ const completedList = document.getElementById("completed-list");
 // variables :
 let updatedOnLoad = false;
 
+// One Time Warning :
+function warning() {
+  const note = `
+  <div class="overlay" onclick="hideWarning()"></div>
+  <div class="warning">
+  <h1>NOTE</h1>
+  <p>The Drag and Drop functionality of the page <b>Only Works on PC's and Desktop's Not on touch screens !</b></p>
+  </div>
+  `;
+  document.querySelector("body").insertAdjacentHTML("beforeend", note);
+}
+
+// remove warning :
+function hideWarning() {
+  console.log("called!");
+  document.querySelector(".overlay").classList.add("hidden");
+  document.querySelector(".warning").classList.add("hidden");
+}
+
 // Drag Functionality variables :
 let dragging = false;
 let currConatiner;
@@ -34,6 +53,7 @@ function getSavedItems() {
       localStorage.completeListArrayInLocalStorage
     );
   } else {
+    warning();
     inProgressListArray = ["Enjoying Life 🕺", "Higher Studies 🧑‍🎓"];
     completedListArray = ["20 Years On 🌏", "Marvel Series 🎥"];
   }
@@ -77,7 +97,6 @@ function updateUI() {
   if (!updatedOnLoad) {
     getSavedItems();
   }
-
   const lists = [
     [inProgressList, inProgressListArray],
     [completedList, completedListArray],
@@ -87,8 +106,9 @@ function updateUI() {
     mainEl[1].forEach((el, i) => {
       createItemEl(mainEl[0], index, el, i);
     });
-    mainEl[1] = filterArray(mainEl[1]);
   });
+  inProgressListArray = filterArray(inProgressListArray);
+  completedListArray = filterArray(completedListArray);
 
   // Run getSavedItems() only once , Update Local Storage
   updatedOnLoad = true;

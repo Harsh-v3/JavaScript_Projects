@@ -223,6 +223,53 @@ ul {
   outline: none;
 }
 
+.overlay {
+  position: fixed;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  background: #0005;
+  z-index: 5;
+  transition: all 0.2s ease-in-out;
+}
+
+.warning {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  border-radius: 0.2rem;
+  padding: 2rem;
+  background: var(--color-primary);
+  box-shadow: 0 1rem 1.5rem #0003;
+  color: black;
+  z-index: 6;
+  transition: all 0.2s ease-in-out;
+}
+
+.warning h1 {
+  font-weight: 100;
+  font-size: 3rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--color-dark);
+}
+
+.warning p {
+  font-size: 1.5rem;
+  color: var(--color-secondry);
+}
+
+.warning p b {
+  color: var(--color-dark);
+}
+
+.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
 /* Media Query: Laptop */
 @media screen and (max-width: 1800px) {
 }
